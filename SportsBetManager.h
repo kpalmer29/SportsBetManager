@@ -6,9 +6,6 @@
 #define SPORTSBETMANAGER_SPORTSBETMANAGER_H
 
 #include "SportsBet.h"
-#include "Spread.h"
-#include "OverUnder.h"
-#include "Prop.h"
 #include "BetNode.h"
 #include <stdexcept>
 #include <string>
@@ -54,8 +51,6 @@ public:
     void deleteBetsFor(const std::string &oldBet);
 
     void deleteBetsAgainst(const std::string &oldBet);
-
-    //void merge(const SportsBetManager &sbm);
 
     bool exists(const SportsBet &newBet);
 

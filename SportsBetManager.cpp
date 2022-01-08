@@ -7,7 +7,7 @@
 
 SportsBetManager::SportsBetManager(): numBets(0), betList(nullptr) {}
 
-SportsBetManager::SportsBetManager(const SportsBetManager &rhs): numBets(rhs.numBets), betList(nullptr) {
+SportsBetManager::SportsBetManager(const SportsBetManager &rhs): numBets(rhs.numBets), betList(nullptr) { //alt ctor
     if (rhs.betList != nullptr) {
         betList = new BetNode;
         betList->bet = rhs.betList->bet;
@@ -24,7 +24,7 @@ SportsBetManager::SportsBetManager(const SportsBetManager &rhs): numBets(rhs.num
     }
 }
 
-const SportsBetManager& SportsBetManager::operator=(const SportsBetManager &rhs) {
+const SportsBetManager& SportsBetManager::operator=(const SportsBetManager &rhs) { //assignment op
     if (this != &rhs) {
         SportsBetManager temp(rhs);
         std::swap(betList, temp.betList);
@@ -33,7 +33,7 @@ const SportsBetManager& SportsBetManager::operator=(const SportsBetManager &rhs)
     return *this;
 }
 
-SportsBetManager::~SportsBetManager() {
+SportsBetManager::~SportsBetManager() { //destructor
     while (betList != nullptr) {
         BetNode* temp = betList;
         betList = betList -> next;
@@ -45,14 +45,18 @@ int SportsBetManager::getNumBets() const {
     return numBets;
 }
 
+//adds a bet to SportsBetManager. Bets stored based on date - earliest first - and are added
+//at the appropriate point in the linked list according to the bet's date. If other bets
+//exist on the same date, the param bet is added after those bets.
 void SportsBetManager::addBet(const SportsBet &newBet) {
     if (exists(newBet))
         throw std::invalid_argument("Bet Already Exists");
 
-    BetNode* temp = new BetNode;
+    BetNode* temp = new BetNode; //create new node for new bet
     temp->bet = newBet;
     temp->next = nullptr;
-    if (numBets == 0) {
+
+    if (numBets == 0) { //base case
         betList = temp;
     }
 
@@ -60,7 +64,7 @@ void SportsBetManager::addBet(const SportsBet &newBet) {
 
         Date insertDate = newBet.getDate();
 
-        if (insertDate < betList->bet.getDate()) {
+        if (insertDate < betList->bet.getDate()) { //bet should be added at beginning of list
             temp->next = betList;
             betList = temp;
         }
@@ -75,7 +79,7 @@ void SportsBetManager::addBet(const SportsBet &newBet) {
 
             BetNode* prev = betList;
 
-            if (temp2  == nullptr) {
+            if (temp2  == nullptr) { //new bet should be inserted at end of list
                 while (prev ->next != nullptr) {
                     prev = prev -> next;
                 }
@@ -95,6 +99,8 @@ void SportsBetManager::addBet(const SportsBet &newBet) {
     numBets++;
 }
 
+//return true if the param bet is equal to any bets in the Manager
+//otherwise, returns false
 bool SportsBetManager::exists(const SportsBet &newBet) {
     if (numBets == 0)
         return false;
@@ -107,22 +113,23 @@ bool SportsBetManager::exists(const SportsBet &newBet) {
         temp = temp -> next;
     }
 
-    return false;
+    return false; //bet does not exist in Manager
 
 }
 
+//returns a string of all bets which occur on param date
 std::string SportsBetManager::getBetsOnDate(Date date) const {
     if (numBets == 0)
         return "This Sports Bet Manager is empty";
 
     std::string returnString;
-    int numBetsOnDate = 0;
+    int numBetsOnDate = 0; //counter
 
     BetNode* temp = betList;
 
     while (temp != nullptr) {
         if (temp->bet.getDate() == date) {
-            returnString.append(temp->bet.toString() + "\n");
+            returnString.append(temp->bet.toString() + "\n"); //add bet to returnString
             numBetsOnDate++;
         }
         temp = temp -> next;
@@ -136,18 +143,19 @@ std::string SportsBetManager::getBetsOnDate(Date date) const {
 
 }
 
+//returns a string of all bets placed against param team
 std::string SportsBetManager::getBetsAgainst(const std::string &newBet) const {
     if (numBets == 0)
         return "This Sports Bet Manager is empty";
 
     std::string returnString;
-    int numBetsAgainst = 0;
+    int numBetsAgainst = 0; //counter
 
     BetNode* temp = betList;
 
     while (temp != nullptr) {
         if (temp -> bet.getAgainst() == newBet) {
-            returnString.append(temp->bet.toString() + "\n");
+            returnString.append(temp->bet.toString() + "\n"); //append bet to returnString
             numBetsAgainst++;
         }
         temp = temp -> next;
@@ -159,12 +167,13 @@ std::string SportsBetManager::getBetsAgainst(const std::string &newBet) const {
         return returnString;
 }
 
+//returns a string of all bets for a sport
 std::string SportsBetManager::getBetsOfSport(const std::string &spt) const {
     if (numBets == 0)
         return "This Sports Bet Manager is empty";
 
     std::string returnString;
-    int numBetsOfSport = 0;
+    int numBetsOfSport = 0; //counter
 
     BetNode* temp = betList;
 
@@ -182,12 +191,13 @@ std::string SportsBetManager::getBetsOfSport(const std::string &spt) const {
         return returnString;
 }
 
+//returns a string of all bets placed for a team
 std::string SportsBetManager::getBetsFor(const std::string &newBet) const {
     if (numBets == 0)
         return "This Sports Bet Manager is empty";
 
     std::string returnString;
-    int numBetsFor = 0;
+    int numBetsFor = 0; //counter
 
     BetNode* temp = betList;
 
@@ -205,6 +215,7 @@ std::string SportsBetManager::getBetsFor(const std::string &newBet) const {
         return returnString;
 }
 
+//returns a string of all bets stored by the Manager
 std::string SportsBetManager::getAllBets() const {
     if (numBets == 0)
         return "This Sports Bet Manager is empty";
@@ -221,16 +232,18 @@ std::string SportsBetManager::getAllBets() const {
     return returnString;
 }
 
+//deletes all bets in the manager
 void SportsBetManager::deleteAllBets() {
     betList = nullptr;
     numBets = 0;
 }
 
+//deletes the specified bet from the Manager
 void SportsBetManager::deleteBet(const SportsBet &oldBet) {
     if (!exists(oldBet))
         throw std::invalid_argument("Bet does not exist in current Manager");
 
-    if (betList->bet == oldBet)
+    if (betList->bet == oldBet) //bet for deletion is first bet in Manager.
         betList = betList->next;
 
     else {
@@ -238,13 +251,13 @@ void SportsBetManager::deleteBet(const SportsBet &oldBet) {
         BetNode *temp;
 
         for (temp = betList; temp != nullptr; temp = temp->next) {
-            if (temp->bet == oldBet) {
+            if (temp->bet == oldBet) { //temp points to node to be deleted
                 BetNode *prev = betList;
-                while (prev->next != temp) {
+                while (prev->next != temp) { //move prev to one before temp
                     prev = prev->next;
                 }
 
-                prev->next = temp->next;
+                prev->next = temp->next; //assignment
 
             }
         }
@@ -252,6 +265,7 @@ void SportsBetManager::deleteBet(const SportsBet &oldBet) {
     numBets--;
 }
 
+//deletes all bets placed for a certain team
 void SportsBetManager::deleteBetsFor(const std::string &oldBet) {
     if (numBets == 0)
         throw std::invalid_argument("Manager is empty");
@@ -259,8 +273,8 @@ void SportsBetManager::deleteBetsFor(const std::string &oldBet) {
     BetNode* curr;
 
     for (curr = betList; curr != nullptr; curr = curr -> next) {
-        if (curr->bet.getFor() == oldBet) {
-            if (betList == curr)
+        if (curr->bet.getFor() == oldBet) { //if curr is pointed towards a node to be deleted
+            if (betList == curr) //base case
                 betList = curr -> next;
             else {
                 BetNode* prev;
@@ -272,6 +286,7 @@ void SportsBetManager::deleteBetsFor(const std::string &oldBet) {
     }
 }
 
+//delets all bets placed against a certain team
 void SportsBetManager::deleteBetsAgainst(const std::string &oldBet) {
     if (numBets == 0)
         throw std::invalid_argument("Manager is empty");
@@ -279,8 +294,8 @@ void SportsBetManager::deleteBetsAgainst(const std::string &oldBet) {
     BetNode* curr;
 
     for (curr = betList; curr != nullptr; curr = curr -> next) {
-        if (curr->bet.getAgainst() == oldBet) {
-            if (betList == curr)
+        if (curr->bet.getAgainst() == oldBet) { //if curr is pointed towards a node to be deleted
+            if (betList == curr) //base case
                 betList = curr -> next;
             else {
                 BetNode* prev;
@@ -292,6 +307,7 @@ void SportsBetManager::deleteBetsAgainst(const std::string &oldBet) {
     }
 }
 
+//deletes all bets before a specified date
 std::string SportsBetManager::deleteBetsBefore(const Date &date) {
     if (numBets == 0)
         throw std::invalid_argument("Manager is empty");
@@ -313,31 +329,3 @@ std::string SportsBetManager::deleteBetsBefore(const Date &date) {
         return "Done";
     }
 }
-
-//void SportsBetManager::merge(const SportsBetManager &sbm) {
-//    if (sbm.numBets == 0)
-//        return;
-//
-//    if (numBets == 0)
-//        betList = sbm.betList;
-//
-//    BetNode* list1ptr = betList;
-//    BetNode* list2ptr = sbm.betList;
-//
-//    while (list1ptr != nullptr && list2ptr != nullptr) {
-//        if (list2ptr == nullptr)
-//            list1ptr = list1ptr -> next;
-//        else if (list1ptr == nullptr) {
-//            BetNode* temp = betList;
-//            while (temp-> next != nullptr) {
-//                temp = temp -> next;
-//            }
-//            temp -> next = list2ptr;
-//        }
-//
-//
-//        if (list1ptr -> bet.getDate() <= list2ptr -> bet.getDate())
-//            list1ptr = list1ptr -> next;
-//    }
-//
-//}
